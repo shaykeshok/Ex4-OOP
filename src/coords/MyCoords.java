@@ -1,157 +1,126 @@
 package coords;
 
+import Coords.coords_converter;
 import Geom.Point3D;
 
-public class MyCoords {
-	private final int RadiusEarth = 6371000;
-	
+public class MyCoords implements coords_converter{
 	/**
-	 * @param p: convert him from degrees to radian
-	 * @return new point of radians
+	 * This class has function on coordinate
+	 * @author Shayke Shok and Omer Edut
 	 */
-	private Point3D d2r(Point3D p) {
-		return new Point3D(Point3D.d2r(p.x()),Point3D.d2r(p.y()),p.z());
+	private Point3D pixel1;
+	private Point3D pixel2;
+	private Point3D gps1;
+	private Point3D gps2;
+	private double p2g;
+	private double g2p;
+	
+	
+	public MyCoords(Point3D p1,Point3D p2,Point3D g1,Point3D g2) {
+		pixel1=new Point3D(p1);
+		pixel2=new Point3D(p2);
+		gps1=new Point3D(g1);
+		gps2=new Point3D(g2);
+		double xPixels=p2.x();		
+		double xgps=g1.x()-g2.x();
+		p2g=xPixels/xgps;
+		g2p=xgps/xPixels;
+	}
+	public MyCoords() {
+		pixel1=new Point3D(0,0,0);
+		pixel2=new Point3D(0,0,0);
+		gps1=new Point3D(0,0,0);
+		gps2=new Point3D(0,0,0);
+		p2g=0;
+		g2p=0;
+	}
+		
+	/** computes a new point which is the gps point transformed by a 3D vector (in meters)*/
+	@Override
+	public Point3D add(Point3D gps, Point3D local_vector_in_meter) {
+		//to meters
+		Point3D adding = new Point3D(gps.Gps2Meter1());
+		//adding the points
+		adding.add(local_vector_in_meter);
+		// converting back to degree
+		Point3D gps2 = new Point3D(adding.meter2Gps1());
+		return gps2;
 	}
 	
-	/**
-	 * computes the distance between 2 gps points
-	 * @param gps0 is the first gps point given
-	 * @param gps1 is the second gps point given
-	 * @return distance between the two points
-	 */
+	public double regulardis(Point3D p1,Point3D p2) {
+		double dis=Math.sqrt(p1.x()*p2.x()+p1.y()+p2.y());
+		return dis;
+	}
+
+	/** computes the distance between two points 2d (in meters)
+	 * According to the according to the given excel
+	 * */
+	public double distance2d(Point3D gps0, Point3D gps1) {
+	    double RADIUS = 6371000;
+	    double LON_NORM = 0.847091174;
+		double diffx=gps1.x()-gps0.x();
+		double diffy=gps1.y()-gps0.y();
+		// to radian 
+		double diffxR=(Math.toRadians(diffx));
+	    double diffyR=(Math.toRadians(diffy));
+	    // to meter 
+	    double diffxM=Math.sin(diffxR)*RADIUS;
+	    double diffyM=Math.sin(diffyR)*RADIUS*LON_NORM;
+	    // Pitagoras 
+		return Math.sqrt(diffxM*diffxM+diffyM*diffyM);
+	}
+	
+
+	/** computes the 3D distance (in meters) between the two gps like points */
+	@Override
 	public double distance3d(Point3D gps0, Point3D gps1) {
-		if(isValid_GPS_Point(gps0)&&isValid_GPS_Point(gps1)) {
-		Point3D gps0Radians = d2r(gps0);
-		Point3D gps1Radians = d2r(gps1);		
-		double diffX = gps1Radians.x() - gps0Radians.x();
-		double diffY = gps1Radians.y() - gps0Radians.y();		
-		double lat = Math.sin(diffX)*RadiusEarth;
-		double lon = Math.sin(diffY)*RadiusEarth*Math.cos(gps0Radians.x());	
-		return Math.sqrt(Math.pow(lat, 2) + Math.pow(lon, 2) );
-	
-		}
-		return 0;
+	MyCoords md = new MyCoords();	
+    double dis =md.distance2d(gps0,gps1);
+    double height=gps0.z()-gps1.z();
+    double ans=Math.sqrt(dis*dis+height*height);
+    return ans;
 	}
 	
-	/**
-	 * computes the polar representation of the 3D vector be gps0-->gps1 Note: this
-	 * method should return an azimuth (aka yaw), elevation (pitch), and distance
-	 */
-	public double[] azimuth_elevation_dist(Point3D gps0, Point3D gps1) {
-		if (isValid_GPS_Point(gps0) && isValid_GPS_Point(gps0)) {
-			double[] ans = new double[3];
-
-			// calculate azimuth
-			double x0 = Point3D.d2r(gps0.x());
-			double x1 = Point3D.d2r(gps1.x());
-			double dY = Point3D.d2r(gps1.y() - gps0.y());
-
-			double x = Math.sin(dY) * Math.cos(x1);
-			double y = Math.cos(x0) * Math.sin(x1) - Math.sin(x0) * Math.cos(x1) * Math.cos(dY);
-			double azimuth = Math.atan2(x, y);
-
-			if (Point3D.r2d(azimuth) < 0)
-				azimuth = 360 + Math.toDegrees(azimuth);
-			else
-				azimuth = Math.toDegrees(azimuth);
-
-			double elevation = Point3D.r2d(Math.acos((gps1.z() - gps0.z()) / distance3d(gps0, gps1)));
-
-			ans[0] = azimuth;
-			ans[1] = elevation;
-			ans[2] = distance3d(gps0, gps1);
-
-			return ans;
-		}
-		return null;
-	}
-	
-	/**
-	 * return true if this point is a valid lat, lon , lat coordinate:[-180,+180],[-90,+90],[-450, +inf]
-	 * @param p -point
-	 * @return true if this point is a valid point
-	 */
-	public boolean isValid_GPS_Point(Point3D p) {
-		return (p.x() >= (-180) && p.x() <= 180) && (p.y() >= (-90) && p.x() <= 90) && (p.z() >= (-450));
-	}
-	
-	public double[] azimuth_elevation_dist2(Point3D gps0, Point3D gps1) {
-		// Build a new array to contain azimuth, elevation and distance
-		double [] azimuth_elevation_dist= new double[3];
-		// Calculates the azimuth
-		double deltaY=Math.toRadians(gps1.y()-gps0.y());
-		double x1=Math.toRadians(gps1.x());
-		double x0=Math.toRadians(gps0.x());
-		double Y= Math.sin(deltaY) * Math.cos(x1);
-		double X = Math.cos(x0)*Math.sin(x1) -Math.sin(x0)*Math.cos(x1)*Math.cos(deltaY);
-		double teta = Math.atan2(Y, X);
-		double azimuth=(Math.toDegrees(teta)+360)%360;
-	
-		// Put the Azimuth value at the first place in the array
-		azimuth_elevation_dist[0]=azimuth;
-	
-	
-		double distance=distance3d(gps0,gps1);
-		double deltaz=Math.toDegrees(gps1.z()-gps0.z());
-		double elevation=deltaz/distance;
-		azimuth_elevation_dist[1]=elevation;
-	
-		// Put the Distance value at the third place in the array
-		azimuth_elevation_dist[2]=distance;
-		return azimuth_elevation_dist;
-
-
-	}
-	
-	/**
-	 * computes the 3D vector (in meters) between two gps like points
-	 * @param gps0 is the first gps point given
-	 * @param gps1 is the second gps point given
-	 * @return vector of the two points that one is
-	 */
+	/** computes the 3D vector (in meters) between two gps like points */
+	@Override
 	public Point3D vector3D(Point3D gps0, Point3D gps1) {
-		if (isValid_GPS_Point(gps0) && isValid_GPS_Point(gps0)) {		
-			double lon= Math.cos(Math.toRadians(gps0.x()));		
-			double x= RadiusEarth*Math.sin(Math.toRadians((gps1.x()-gps0.x())));
-			double y= lon*RadiusEarth*Math.sin(Math.toRadians((gps1.y()-gps0.y())));
-			double z= gps1.z()-gps0.z();			
-			return new Point3D(x,y,z);		
-		}
-		return null;
+		Point3D meter0 = new Point3D(gps0.Gps2Meter1());
+		Point3D meter1 = new Point3D(gps1.Gps2Meter1());
+		double x=meter1.x()-meter0.x();
+		double y=meter1.y()-meter0.y();
+		double z=meter1.z()-meter0.z();
+		Point3D ans = new Point3D(x,y,z);
+		return ans;
+	}
+
+	
+	/** computes the polar representation of the 3D vector be gps0-->gps1 
+	 * Note: this method should return an azimuth (aka yaw), elevation (pitch), and distance
+	 * note its use the point 3d function that Buaz gave us  
+	 * */
+	@Override
+	public double[] azimuth_elevation_dist(Point3D gps0, Point3D gps1) {
+		double azimuth []= new double[3];
+		azimuth[0]=gps0.north_angle(gps1);
+		azimuth[1]=	gps0.up_angle(gps1);
+		azimuth[2]=distance3d(gps0,gps1);
+		return azimuth;
 	}
 	
-
-    public double[] azimuth_elevation_dist3(Point3D gps0, Point3D gps1) {
-        int azi = 0;
-        int elv = 1;
-        int dis = 2;
-
-        Point3D aziPoint = vector3D(gps0, gps1);
-        double distance = distance3d(gps0, gps1);
-        double height = gps1.z() - gps0.z();
-        double elevation = Math.acos(height/distance);
-
-        double azimuth = 0;
-        double alpha = (Math.atan(Math.abs(aziPoint.y())/Math.abs(aziPoint.x()))*180)/Math.PI;
-        if (aziPoint.y() >= 0){
-            if (aziPoint.x() >= 0){
-                azimuth = alpha;
-            } else {
-                azimuth = 180 - alpha;
-            }
-        } else {
-            if (aziPoint.x() >= 0) {
-                azimuth = 360 - alpha;
-            } else {
-                azimuth = 180 + alpha;
-            }
-        }
-        double[] aed = new double[3];
-        ///////////////////////////////////////////////////
-        aed[azi] = azimuth;
-        aed[elv] = elevation;
-        aed[dis] = distance;
-        return aed;
-    }
-
+	/**
+	 * return true iff this point is a valid lat, lon , lat coordinate: [-180,+180],[-90,+90],[-450, 8000]
+	 * @param p
+	 * @return
+	 */
+	@Override
+	public boolean isValid_GPS_Point(Point3D p) {
+		boolean flag=true;
+		if(p.x()>180||p.x()<-180)
+		flag= false;
+		if(p.y()>90||p.y()<-90)
+		flag= false;
+		if(p.z()>8000||p.z()<-450)
+		flag= false;
+		return flag;
+	}
 }

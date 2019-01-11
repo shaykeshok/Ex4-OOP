@@ -102,7 +102,7 @@ public class Game {
 			ghostLst.add((Ghost) object);
 			break;
 		case "b":case "B":
-			object=new Box(Integer.parseInt(element[1]),point,new Point3D(Double.parseDouble(element[5]),Double.parseDouble(element[6]),Double.parseDouble(element[7])));
+			object=new Box(Integer.parseInt(element[1]),point,new Point3D(Double.parseDouble(element[6]),Double.parseDouble(element[5]),Double.parseDouble(element[7])));
 			boxLst.add((Box) object);
 			break;
 		}

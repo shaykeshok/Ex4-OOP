@@ -11,13 +11,22 @@ public class Box implements GameElement{
 	private int id;
 	private Point3D point1, point2;
 	private Map map=new Map();
+	private Point3D start;
+	private Point3D end;
 
 	public Box(int _id, Point3D _point1, Point3D _point2) {
 		id = _id;
 		point1 = _point1;
 		point2 = _point2;
+		start=new Point3D(point1.x()-0.000011,point1.y()-0.000011,point1.z());
+		end=new Point3D(point2.x()+0.000011,point2.y()+0.000011,point2.z());
 	}
-
+	public Point3D getStart() {
+		return start;
+	}
+	public Point3D getEnd() {
+		return end;
+	}
 	@Override
 	public int getId() {
 		return 0;

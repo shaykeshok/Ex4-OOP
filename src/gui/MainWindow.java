@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -70,9 +71,16 @@ public class MainWindow extends JFrame implements MouseListener {
 				for (Box boxO : game.getBox()) {
 					Point3D pix = map.polar2Pixel(boxO.getPoint());
 					double[] arr = boxO.getHeightWidth();
-					//g.drawRect(pix.ix(), (int) pix.y(), (int) arr[0], (int) arr[1]);
+					g.drawRect(pix.ix(), (int) pix.y(), (int) arr[0], (int) arr[1]);
 					System.out.println(arr[0]+","+arr[1]);
+					g.setColor(Color.BLUE); 
 					g.fillRect(pix.ix(), (int) pix.y(), (int) arr[0], (int) arr[1]);
+					
+					
+					//Point3D temp_point2=map.polar2Pixel(boxO.getStart());
+					//Point3D temp_point1=map.polar2Pixel(boxO.getEnd());
+					//g.setColor(Color.BLUE); 
+					//g.fillRect(temp_point1.ix()-(temp_point1.ix()-temp_point2.ix())+10,temp_point1.iy()+10,(temp_point1.ix()-temp_point2.ix()),(temp_point2.iy()-temp_point1.iy()));
 				}
 			}
 		};
@@ -137,7 +145,8 @@ public class MainWindow extends JFrame implements MouseListener {
 			pacmanItem.setEnabled(true);
 		} else {
 			if (play) {
-				double[] arr = myCoords.azimuth_elevation_dist3(game.getPacman().get(game.getindexOfM()).getPoint(),
+				
+				double[] arr = myCoords.azimuth_elevation_dist(game.getPacman().get(game.getindexOfM()).getPoint(),
 						point);
 				dir = arr[0];
 				System.out.println(dir);
