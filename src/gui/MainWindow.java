@@ -70,7 +70,9 @@ public class MainWindow extends JFrame implements MouseListener {
 				for (Box boxO : game.getBox()) {
 					Point3D pix = map.polar2Pixel(boxO.getPoint());
 					double[] arr = boxO.getHeightWidth();
-					g.drawRect( pix.ix(), (int) pix.y(), (int) arr[0], (int) arr[1]);
+					//g.drawRect(pix.ix(), (int) pix.y(), (int) arr[0], (int) arr[1]);
+					System.out.println(arr[0]+","+arr[1]);
+					g.fillRect(pix.ix(), (int) pix.y(), (int) arr[0], (int) arr[1]);
 				}
 			}
 		};
@@ -128,16 +130,17 @@ public class MainWindow extends JFrame implements MouseListener {
 		Point3D point = new Point3D(map.pixel2Polar(x, y));
 		if (setMyPacman) {
 			setMyPacmanPos(point);
-			play1.setInitLocation(point.x(), point.y());
+			play1.setInitLocation(point.y(), point.x());
 			jPanel.repaint();
 
 			setMyPacman = false;
-			// pacmanItem.hide();
+			pacmanItem.setEnabled(true);
 		} else {
 			if (play) {
-				double[] arr = myCoords.azimuth_elevation_dist(game.getPacman().get(game.getindexOfM()).getPoint(),
+				double[] arr = myCoords.azimuth_elevation_dist3(game.getPacman().get(game.getindexOfM()).getPoint(),
 						point);
 				dir = arr[0];
+				System.out.println(dir);
 			}
 		}
 	}
@@ -173,9 +176,9 @@ public class MainWindow extends JFrame implements MouseListener {
 
 					getBoardData();
 					jPanel.repaint();
-
 					System.out.println();
 					System.out.println("Init Player Location should be set");
+					
 				} catch (FileNotFoundException e1) {
 					System.out.println("File not found");
 				}
@@ -203,6 +206,11 @@ public class MainWindow extends JFrame implements MouseListener {
 						int i = 0;
 						while (play1.isRuning()) {
 							i++;
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
 							play1.rotate(dir);
 							System.out.println("****** " + i + " ******");
 							String info = play1.getStatistics();

@@ -82,7 +82,7 @@ public class Game {
 	public void addString(String s) {
 		String[] element = s.split(",");
 		GameElement object;
-		Point3D point=new Point3D(Double.parseDouble(element[2]),Double.parseDouble(element[3]),Double.parseDouble(element[4]));
+		Point3D point=new Point3D(Double.parseDouble(element[3]),Double.parseDouble(element[2]),Double.parseDouble(element[4]));
 		switch (element[0]) {
 		case "p": case "P":
 			object=new Pacman(Integer.parseInt(element[1]),point,(int)Double.parseDouble(element[5]),(int)Double.parseDouble(element[6]));

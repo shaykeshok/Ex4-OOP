@@ -40,6 +40,10 @@ public class Box implements GameElement{
 	public double[] getHeightWidth() {	
 		Point3D pix1=map.polar2Pixel(point1);
 		Point3D pix2=map.polar2Pixel(point2);
+		System.out.println("pix1:"+pix1);
+		System.out.println("pix2:"+pix2);
+		System.out.println("Math.abs(pix1.x()-pix2.x()):"+Math.abs(pix1.x()-pix2.x()));
+		System.out.println("Math.abs(pix1.y()-pix2.y():"+Math.abs(pix1.y()-pix2.y()));
 		double[] ans= {Math.abs(pix1.x()-pix2.x()),Math.abs(pix1.y()-pix2.y())};
 		return ans;
 	}
