@@ -71,23 +71,6 @@ public class Map {
 
 
 	/**
-	 * This method convert distance between 2 points to distans in pixels 
-	 * @param src point
-	 * @param dst point
-	 * @return the distance between 2 points in pixels
-	 */
-//	public int distanceInPixels(Point3D src, Point3D dst) {
-	//	MyCoords coords = new MyCoords();
-	//	Point3D vector = coords.vector3D(src, dst);
-	//	double d =  Math.sqrt(Math.pow(vector.x(), 2) + Math.pow(vector.y(), 2) + Math.pow(vector.z(), 2));
-	//	double dx = vector.x()*pixel_per_meter_x;
-	//	double dy = vector.y()*pixel_per_meter_y;
-	//	int distance = (int)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2) + Math.pow(vector.z(), 2));
-	//	return distance;
-	//}
-
-
-	/**
 	 * This method convert pixels point to polar point
 	 * @param x,y of pixel point to convert
 	 * @return the given point in polar

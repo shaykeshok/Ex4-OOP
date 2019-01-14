@@ -1,6 +1,5 @@
 package gameObjects;
 
-import game.ElementGame;
 import Geom.Point3D;
 
 public class Fruit implements GameElement{
@@ -32,7 +31,7 @@ public class Fruit implements GameElement{
 		return mikum;
 	}
 	/**
-	 * @return the id Fruit
+	 * @return the id of Fruit
 	 */
 	public int getId() {
 		return id;
@@ -75,21 +74,23 @@ public class Fruit implements GameElement{
 		return "f,"+id + "," + mikum.y()+","+mikum.x()+","+mikum.z() + "," + weight;
 	}
 
+	/**
+	 * This function set a new id to the fruit
+	 */
 	@Override
-	public void sedId() {
-		// TODO Auto-generated method stub
-		
+	public void setId(int x) {
+		id=x;
 	}
 
+	/**
+	 * This function set a new point to the fruit
+	 */
 	@Override
-	public void setPoint() {
-		// TODO Auto-generated method stub
-		
+	public void setPoint(Point3D point) {
+		mikum=point;
 	}
 
 	@Override
 	public void setAttribute() {
-		// TODO Auto-generated method stub
-		
 	}
 }

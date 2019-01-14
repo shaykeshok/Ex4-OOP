@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.FileDialog;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Menu;
@@ -24,6 +25,7 @@ import javax.swing.JPanel;
 
 import Robot.Play;
 import coords.MyCoords;
+import game.BI;
 import game.Game;
 import game.Map;
 import gameObjects.Box;
@@ -31,15 +33,19 @@ import gameObjects.Fruit;
 import gameObjects.Ghost;
 import gameObjects.Pacman;
 import Geom.Point3D;
-
+/**
+ * This class represents the main window of the game 
+ * @author Shayke Shok and Omer Edut
+ *
+ */
 public class MainWindow extends JFrame implements MouseListener {
 	private MenuBar menuBar;
-	private Menu fileMenu, gameMenu, createGame;
-	private MenuItem openItem, saveItem, clearItem, pacmanItem, playGameItem;
+	private Menu fileMenu, gameMenu;
+	private MenuItem openItem, clearItem, pacmanItem, playGameItem,bi;
 	private Game game;
-	private Image pacman, fruit, ghost;
+	private Image pacman, fruit, ghost, myPacman;
 	public BufferedImage myImage;
-	private boolean play = false, setMyPacman = false;
+	private boolean play = false, setMyPacman = false, iPutMyPacman = false;
 	private Map map;
 	JPanel jPanel;
 	private int x = -1, y = -1;
@@ -55,32 +61,37 @@ public class MainWindow extends JFrame implements MouseListener {
 		jPanel = new JPanel() {
 			public void paint(Graphics g) {
 				g.drawImage(map.getImg(), 0, 0, this);
-
+				int i = 0;
 				for (Pacman pacmanO : game.getPacman()) {
 					Point3D pix = map.polar2Pixel(pacmanO.getPoint());
-					g.drawImage(pacman, pix.ix(), pix.iy(), 30, 30, this);
+					if (i != game.getindexOfM())
+						g.drawImage(pacman, pix.ix(), pix.iy(), 30, 30, this);
+					else
+						g.drawImage(myPacman, pix.ix(), pix.iy(), 30, 30, this);
+					i++;
 				}
+				
 				for (Fruit fruitO : game.getFruit()) {
 					Point3D pix = map.polar2Pixel(fruitO.getPoint());
 					g.drawImage(fruit, pix.ix(), pix.iy(), 30, 30, this);
 				}
 				for (Ghost ghostO : game.getGhosts()) {
-					Point3D pix = map.polar2Pixel(ghostO.getPoint());
+					Point3D pix = map.polar2Pixel(ghostO.getPoint());				
 					g.drawImage(ghost, pix.ix(), pix.iy(), 30, 30, this);
 				}
 				for (Box boxO : game.getBox()) {
-					Point3D pix = map.polar2Pixel(boxO.getPoint());
-					double[] arr = boxO.getHeightWidth();
-					g.drawRect(pix.ix(), (int) pix.y(), (int) arr[0], (int) arr[1]);
-					System.out.println(arr[0]+","+arr[1]);
-					g.setColor(Color.BLUE); 
-					g.fillRect(pix.ix(), (int) pix.y(), (int) arr[0], (int) arr[1]);
-					
-					
-					//Point3D temp_point2=map.polar2Pixel(boxO.getStart());
-					//Point3D temp_point1=map.polar2Pixel(boxO.getEnd());
-					//g.setColor(Color.BLUE); 
-					//g.fillRect(temp_point1.ix()-(temp_point1.ix()-temp_point2.ix())+10,temp_point1.iy()+10,(temp_point1.ix()-temp_point2.ix()),(temp_point2.iy()-temp_point1.iy()));
+					Point3D pix1 = map.polar2Pixel(boxO.getStartPoint());				
+					Point3D pix2 = map.polar2Pixel(boxO.getEndPoint());				
+					g.setColor(Color.BLUE);
+					g.fillRect(pix2.ix() - (pix2.ix() - pix1.ix()) + 10, pix2.iy() + 10, (pix2.ix() - pix1.ix()),
+							(pix1.iy() - pix2.iy()));
+				}
+				if (play1 != null) {
+					String score = play1.getStatistics();
+					g.setColor(Color.WHITE);
+					Font font = new Font("Verdana", Font.BOLD, 20);
+					g.setFont(font);
+					g.drawString(score, 20, 20);
 				}
 			}
 		};
@@ -88,6 +99,7 @@ public class MainWindow extends JFrame implements MouseListener {
 		game = new Game();
 		map = new Map();
 		try {
+			myPacman = ImageIO.read(new File("icons\\mypacman.png"));
 			pacman = ImageIO.read(new File("icons\\pacman.png"));
 			fruit = ImageIO.read(new File("icons\\pineapple.png"));
 			ghost = ImageIO.read(new File("icons\\ghost.png"));
@@ -109,23 +121,21 @@ public class MainWindow extends JFrame implements MouseListener {
 		menuBar = new MenuBar();
 		fileMenu = new Menu("File");
 		openItem = new MenuItem("Open csv file");
-		saveItem = new MenuItem("Save file to csv");
 
 		menuBar.add(fileMenu);
 		fileMenu.add(openItem);
-		fileMenu.add(saveItem);
 		this.setMenuBar(menuBar);
 
 		// set game menu
 		gameMenu = new Menu("Game options");
-		createGame = new Menu("Create new game");
 		clearItem = new MenuItem("Clear game");
 		pacmanItem = new MenuItem("Set my pacman location");
 		playGameItem = new MenuItem("start game");
-		createGame.add(pacmanItem);
-		gameMenu.add(createGame);
+		bi=new MenuItem("BI of games");
+		gameMenu.add(pacmanItem);
 		gameMenu.add(clearItem);
 		gameMenu.add(playGameItem);
+		gameMenu.add(bi);
 		menuBar.add(gameMenu);
 	}
 
@@ -137,15 +147,17 @@ public class MainWindow extends JFrame implements MouseListener {
 		y = arg.getY();
 		Point3D point = new Point3D(map.pixel2Polar(x, y));
 		if (setMyPacman) {
+			point = new Point3D(map.pixel2Polar(x-20, y-57));
 			setMyPacmanPos(point);
 			play1.setInitLocation(point.y(), point.x());
 			jPanel.repaint();
 
 			setMyPacman = false;
+			iPutMyPacman = true;
 			pacmanItem.setEnabled(true);
 		} else {
 			if (play) {
-				
+
 				double[] arr = myCoords.azimuth_elevation_dist(game.getPacman().get(game.getindexOfM()).getPoint(),
 						point);
 				dir = arr[0];
@@ -174,6 +186,12 @@ public class MainWindow extends JFrame implements MouseListener {
 			}
 
 		});
+		bi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				BI.doBI();
+			}
+
+		});
 		openItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -187,52 +205,44 @@ public class MainWindow extends JFrame implements MouseListener {
 					jPanel.repaint();
 					System.out.println();
 					System.out.println("Init Player Location should be set");
-					
+
 				} catch (FileNotFoundException e1) {
 					System.out.println("File not found");
 				}
 			}
 
 		});
-		saveItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("save file");
-				String pth = writeFileDialog();
-				/*
-				 * try { game.saveGame(pth); } catch (IOException ex) {
-				 * System.out.print("Error writing file  " + ex); }
-				 */
-			}
-		});
+
 		playGameItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("start game..");
-				play1.start();
-				play = true;
-				x = y = -1;
-				new Thread(new Runnable() {
-					public void run() {
-						int i = 0;
-						while (play1.isRuning()) {
-							i++;
-							try {
-								Thread.sleep(100);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
+				if (iPutMyPacman) {
+					System.out.println("start game..");
+					play1.start();
+					play = true;
+					x = y = -1;
+					new Thread(new Runnable() {
+						public void run() {
+							int i = 0;
+							while (play1.isRuning()) {
+								i++;
+								try {
+									Thread.sleep(100);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								play1.rotate(dir);
+								System.out.println("****** " + i + " ******");
+								String info = play1.getStatistics();
+								System.out.println(info);
+								getBoardData();
+								jPanel.repaint();
+
 							}
-							play1.rotate(dir);
-							System.out.println("****** " + i + " ******");
-							String info = play1.getStatistics();
-							System.out.println(info);
-							getBoardData();
-							jPanel.repaint();
-
-							System.out.println("end run: " + i);
+							play = false;
 						}
-						play = false;
-					}
-				}).start();
+					}).start();
 
+				}
 			}
 		});
 		clearItem.addActionListener(new ActionListener() {
@@ -249,7 +259,7 @@ public class MainWindow extends JFrame implements MouseListener {
 	}
 
 	/**
-	 * method the send the ids to the server
+	 * method that send the ids to the server
 	 */
 	private void putid() {
 		if (id1 == null || id1.isEmpty())
@@ -259,6 +269,7 @@ public class MainWindow extends JFrame implements MouseListener {
 		if (id3 == null || id3.isEmpty())
 			id3 = "0";
 		play1.setIDs(Long.parseLong(id1), Long.parseLong(id2), Long.parseLong(id3));
+		
 	}
 
 	/**
