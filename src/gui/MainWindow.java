@@ -41,7 +41,7 @@ import Geom.Point3D;
 public class MainWindow extends JFrame implements MouseListener {
 	private MenuBar menuBar;
 	private Menu fileMenu, gameMenu;
-	private MenuItem openItem, clearItem, pacmanItem, playGameItem,bi;
+	private MenuItem openItem, clearItem, pacmanItem, playUserGameItem,playAutoGameItem,bi;
 	private Game game;
 	private Image pacman, fruit, ghost, myPacman;
 	public BufferedImage myImage;
@@ -130,11 +130,13 @@ public class MainWindow extends JFrame implements MouseListener {
 		gameMenu = new Menu("Game options");
 		clearItem = new MenuItem("Clear game");
 		pacmanItem = new MenuItem("Set my pacman location");
-		playGameItem = new MenuItem("start game");
+		playUserGameItem = new MenuItem("start user game");
+		playAutoGameItem= new MenuItem("start auto game");
 		bi=new MenuItem("BI of games");
 		gameMenu.add(pacmanItem);
 		gameMenu.add(clearItem);
-		gameMenu.add(playGameItem);
+		gameMenu.add(playUserGameItem);
+		gameMenu.add(playAutoGameItem);
 		gameMenu.add(bi);
 		menuBar.add(gameMenu);
 	}
@@ -213,7 +215,39 @@ public class MainWindow extends JFrame implements MouseListener {
 
 		});
 
-		playGameItem.addActionListener(new ActionListener() {
+		playUserGameItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (iPutMyPacman) {
+					System.out.println("start game..");
+					play1.start();
+					play = true;
+					x = y = -1;
+					new Thread(new Runnable() {
+						public void run() {
+							int i = 0;
+							while (play1.isRuning()) {
+								i++;
+								try {
+									Thread.sleep(100);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								play1.rotate(dir);
+								System.out.println("****** " + i + " ******");
+								String info = play1.getStatistics();
+								System.out.println(info);
+								getBoardData();
+								jPanel.repaint();
+
+							}
+							play = false;
+						}
+					}).start();
+
+				}
+			}
+		});
+		playAutoGameItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (iPutMyPacman) {
 					System.out.println("start game..");
