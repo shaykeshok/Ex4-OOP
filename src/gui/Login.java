@@ -14,7 +14,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
-
+/**
+ * This class represents the login window of the game
+ * @author Shayke Shok and Omer Edut
+ *
+ */
 public class Login {
 
 	private JFrame frmLogin;

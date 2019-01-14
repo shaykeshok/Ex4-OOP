@@ -1,7 +1,11 @@
 package gameObjects;
 
 import Geom.Point3D;
-
+/**
+ * This class represents a ghost in the game 
+ * @author Shayke Shok and Omer Edut
+ *
+ */
 public class Ghost implements GameElement{
 	private int id,speed,radius;
 	private Point3D pos;
@@ -64,24 +68,18 @@ public class Ghost implements GameElement{
 	}
 
 
+
 	@Override
-	public void sedId() {
-		// TODO Auto-generated method stub
-		
+	public void setAttribute() {	
 	}
 
 
+	/**
+	 * This function set a new id to the ghost
+	 */
 	@Override
-	public void setPoint() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public void setAttribute() {
-		// TODO Auto-generated method stub
-		
+	public void setId(int x) {
+		id=x;
 	}
 	
 	

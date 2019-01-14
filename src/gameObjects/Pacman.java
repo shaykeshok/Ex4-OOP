@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Geom.Point3D;
-
+/*
+ * This class represents a pacman in the game 
+ * @author Shayke Shok and Omer Edut
+ *
+ */
 public class Pacman implements GameElement {
 	private int id;
 	private transient Point3D mikum;
@@ -147,21 +151,16 @@ public class Pacman implements GameElement {
 		pathPacman.clear();
 	}
 
+	/**
+	 * This function set a new id to the pacman
+	 */
 	@Override
-	public void sedId() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setPoint() {
-		// TODO Auto-generated method stub
-		
+	public void setId(int x) {
+		id=x;
 	}
 
 	@Override
 	public void setAttribute() {
-		// TODO Auto-generated method stub
 		
 	}
 }
