@@ -70,7 +70,7 @@ public class Login {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (canContinue()) {
-					MainWindow window = new MainWindow(id1,id2,id3);
+					MainWindow window = new MainWindow(id1,id2,id3,true);
 					window.setVisible(true);
 					window.setSize(1433, 632);
 					window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,7 +85,7 @@ public class Login {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (canContinue()) {
-					MainWindow window = new MainWindow(id1,id2,id3);
+					MainWindow window = new MainWindow(id1,id2,id3,false);
 					window.setVisible(true);
 					window.setSize(1433, 632);
 					window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

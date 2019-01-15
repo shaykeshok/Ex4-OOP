@@ -18,12 +18,14 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import Robot.Play;
+import algorithm.BuildPath;
 import coords.MyCoords;
 import game.BI;
 import game.Game;
@@ -41,11 +43,11 @@ import Geom.Point3D;
 public class MainWindow extends JFrame implements MouseListener {
 	private MenuBar menuBar;
 	private Menu fileMenu, gameMenu;
-	private MenuItem openItem, clearItem, pacmanItem, playUserGameItem,playAutoGameItem,bi;
+	private MenuItem openItem, clearItem, pacmanItem, playGameItem,bi;
 	private Game game;
 	private Image pacman, fruit, ghost, myPacman;
 	public BufferedImage myImage;
-	private boolean play = false, setMyPacman = false, iPutMyPacman = false;
+	private boolean play = false, setMyPacman = false, iPutMyPacman = false,playAuto=false;
 	private Map map;
 	JPanel jPanel;
 	private int x = -1, y = -1;
@@ -54,10 +56,12 @@ public class MainWindow extends JFrame implements MouseListener {
 	private double dir = 0;
 	private String id1, id2, id3;
 
-	public MainWindow(String _id1, String _id2, String _id3) {
+
+	public MainWindow(String _id1, String _id2, String _id3,boolean autoGame) {
 		id1 = _id1;
 		id2 = _id2;
 		id3 = _id3;
+		if(autoGame)playAuto=true;
 		jPanel = new JPanel() {
 			public void paint(Graphics g) {
 				g.drawImage(map.getImg(), 0, 0, this);
@@ -130,13 +134,11 @@ public class MainWindow extends JFrame implements MouseListener {
 		gameMenu = new Menu("Game options");
 		clearItem = new MenuItem("Clear game");
 		pacmanItem = new MenuItem("Set my pacman location");
-		playUserGameItem = new MenuItem("start user game");
-		playAutoGameItem= new MenuItem("start auto game");
+		playGameItem = new MenuItem("start game");
 		bi=new MenuItem("BI of games");
 		gameMenu.add(pacmanItem);
 		gameMenu.add(clearItem);
-		gameMenu.add(playUserGameItem);
-		gameMenu.add(playAutoGameItem);
+		gameMenu.add(playGameItem);
 		gameMenu.add(bi);
 		menuBar.add(gameMenu);
 	}
@@ -158,7 +160,7 @@ public class MainWindow extends JFrame implements MouseListener {
 			iPutMyPacman = true;
 			pacmanItem.setEnabled(true);
 		} else {
-			if (play) {
+			if (play&&!playAuto) {
 
 				double[] arr = myCoords.azimuth_elevation_dist(game.getPacman().get(game.getindexOfM()).getPoint(),
 						point);
@@ -215,7 +217,7 @@ public class MainWindow extends JFrame implements MouseListener {
 
 		});
 
-		playUserGameItem.addActionListener(new ActionListener() {
+		playGameItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (iPutMyPacman) {
 					System.out.println("start game..");
@@ -232,37 +234,12 @@ public class MainWindow extends JFrame implements MouseListener {
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
-								play1.rotate(dir);
-								System.out.println("****** " + i + " ******");
-								String info = play1.getStatistics();
-								System.out.println(info);
-								getBoardData();
-								jPanel.repaint();
-
-							}
-							play = false;
-						}
-					}).start();
-
-				}
-			}
-		});
-		playAutoGameItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (iPutMyPacman) {
-					System.out.println("start game..");
-					play1.start();
-					play = true;
-					x = y = -1;
-					new Thread(new Runnable() {
-						public void run() {
-							int i = 0;
-							while (play1.isRuning()) {
-								i++;
-								try {
-									Thread.sleep(100);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
+								if(playAuto) {
+									BuildPath build=new BuildPath(game);
+									List<String> lst=build.getGamePath();
+									for (String string : lst) {
+										System.out.println(string);
+									}
 								}
 								play1.rotate(dir);
 								System.out.println("****** " + i + " ******");
