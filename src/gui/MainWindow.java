@@ -25,6 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import Robot.Play;
+import algorithm.AutoGame;
 import algorithm.BuildPath;
 import coords.MyCoords;
 import game.BI;
@@ -165,7 +166,6 @@ public class MainWindow extends JFrame implements MouseListener {
 				double[] arr = myCoords.azimuth_elevation_dist(game.getPacman().get(game.getindexOfM()).getPoint(),
 						point);
 				dir = arr[0];
-				System.out.println(dir);
 			}
 		}
 	}
@@ -235,11 +235,12 @@ public class MainWindow extends JFrame implements MouseListener {
 									e.printStackTrace();
 								}
 								if(playAuto) {
-									BuildPath build=new BuildPath(game);
-									List<String> lst=build.getGamePath();
-									for (String string : lst) {
-										System.out.println(string);
-									}
+									AutoGame auto=new AutoGame(game);
+									Point3D point=map.pixel2Polar(auto.calcMostNearlyFruit());
+									
+									double[] arr = myCoords.azimuth_elevation_dist(game.getPacman().get(game.getindexOfM()).getPoint(),
+											point);
+									dir = arr[0];
 								}
 								play1.rotate(dir);
 								System.out.println("****** " + i + " ******");
