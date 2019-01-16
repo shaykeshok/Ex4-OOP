@@ -18,15 +18,14 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import Geom.Point3D;
 import Robot.Play;
 import algorithm.AutoGame;
-import algorithm.BuildPath;
 import coords.MyCoords;
 import game.BI;
 import game.Game;
@@ -35,7 +34,6 @@ import gameObjects.Box;
 import gameObjects.Fruit;
 import gameObjects.Ghost;
 import gameObjects.Pacman;
-import Geom.Point3D;
 /**
  * This class represents the main window of the game 
  * @author Shayke Shok and Omer Edut
